@@ -1,0 +1,22 @@
+{% load static %}
+
+<link rel="stylesheet" type="text/css" href="{% static 'sell/style.css' %}">
+
+<h1>Selling</h1>
+
+<p>You are selling the item: {{ item.item_name }} </p>
+<p>You bought it for {{ item.buy_price }} at {{ item.buy_date }} </p>
+
+<form action="{% url 'sell:confirm_sell' item.id %}" method="post">
+    {% csrf_token %}
+    <label for="sell_price">Sell price:</label>
+    <input type="text" id="sell_price" name="sell_price"><br><br>
+    <input class="button" type="submit" value="Sell">
+    {% if error_message %}<p class="error_message">{{ error_message }}</p>{% endif %}
+</form>
+
+<!-- <form action="{% url 'sell:sell' item.id %}" method="post">
+    {% csrf_token %}
+    {{ form }}
+    <input type="submit" value="Sell">
+</form> -->

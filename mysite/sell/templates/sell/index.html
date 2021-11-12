@@ -1,0 +1,33 @@
+{% load static %}
+
+<link href="{% static 'sell/css/bootstrap.min.css' %}" >  
+<script src="{% static 'sell/js/bootstrap.min.js' %}"></script>  
+<link rel="stylesheet" type="text/css" href="{% static 'sell/style.css' %}">
+
+{% if latest_item_list %}
+    <table>
+        <tr>
+            <th>Item Name</th>
+            <th>Buy Price</th>
+            <th>Buy Date</th>
+            <th>Buy Source</th>
+            <th>Sell Price</th>
+            <th>Sell Date</th>
+            <th>Profit</th>
+        </tr>
+    {% for item in latest_item_list %}
+        <tr>
+            <td><a href="{% url 'sell:detail' item.id %}">{{ item.item_name }}</a></td>
+            <td>{{ item.buy_price }}</td>
+            <td>{{ item.buy_date }}</td>
+            <td>{{ item.buy_source }}</td>
+            <td>{{ item.sell_price }}</td>
+            <td>{{ item.sell_date }}</td>
+            <td>{{ item.profit_loss }}</td>
+    {% endfor %}
+    </table>
+{% else %}
+    <p>No item are available.</p>
+{% endif %}
+
+<a class="button" href="{% url 'sell:add' %}">Add a new item</a>

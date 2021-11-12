@@ -1,0 +1,20 @@
+{% load static %}
+
+<link href="{% static 'sell/css/bootstrap.min.css' %}" >  
+<script src="{% static 'sell/js/bootstrap.min.js' %}"></script>  
+<link rel="stylesheet" type="text/css" href="{% static 'sell/style.css' %}">
+
+<h1>Item Info</h1> 
+<li><b> Item Name:</b> {{ item.item_name }}</li>
+<li><b> Buy Price:</b> {{ item.buy_price }}</li>
+<li><b> Buy Date:</b> {{ item.buy_date }}</li>
+{% if item.sell_date %} 
+<li><b> Sell Price:</b> {{ item.sell_price }}</li>
+<li><b> Sell Date:</b> {{ item.sell_date }}</li>
+<li><b> Profit/Loss:</b> {{ item.profit_loss }}</li>
+
+
+{% else %}
+<p>The item has not been sold yet</p>
+<a class="button" href="{% url 'sell:sell' item.id %}">SELL</a>
+{% endif %}

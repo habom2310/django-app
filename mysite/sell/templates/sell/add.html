@@ -1,0 +1,13 @@
+{% load static %}
+
+<link href="{% static 'sell/css/bootstrap.min.css' %}" >  
+<script src="{% static 'sell/js/bootstrap.min.js' %}"></script>  
+<link rel="stylesheet" type="text/css" href="{% static 'sell/style.css' %}">
+
+<h1>Add a new item</h1>
+
+<form action="{% url 'sell:add' %}" method="post">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <input class="button" type="submit" value="Add">
+</form>
