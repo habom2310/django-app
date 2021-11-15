@@ -5,6 +5,8 @@ from django.views import generic
 from .models import Item
 from django.utils import timezone
 from .forms import SellForm
+import datetime
+
 
 class IndexView(generic.ListView):
     template_name = 'sell/index.html'
@@ -65,3 +67,46 @@ def add(request):
         form = SellForm()
     return render(request, 'sell/add.html', {'form': form})
 
+from django.db.models import Q
+import math
+def summary(request):
+    query = request.GET.get('q')
+    d_res = {}
+    if not query:
+        object_list = Item.objects.all()
+    else:
+        d_res['query'] = query
+        object_list = Item.objects.filter(
+            Q(item_name__icontains=query)
+        )
+
+    n_buy = len(object_list)
+    total_buy = 0
+    n_sell = 0
+    total_sell = 0
+    total_profit = 0
+    total_buy_of_item_sold = 0
+    for obj in object_list:
+        total_buy += obj.buy_price
+        if obj.sell_price != None:
+            n_sell += 1
+            total_sell += obj.sell_price
+            total_buy_of_item_sold += obj.buy_price
+            total_profit += obj.profit_loss
+
+    avg_buy_price = total_buy / n_buy
+    avg_sell_price = total_sell / n_sell
+    avg_profit = total_profit / n_sell
+    avg_profit_percent = math.floor(total_profit / total_buy_of_item_sold * 100)
+
+    d_res['n_buy'] = n_buy
+    d_res['total_buy'] = total_buy
+    d_res['n_sell'] = n_sell
+    d_res['total_sell'] = total_sell
+    d_res['total_profit'] = total_profit
+    d_res['avg_buy_price'] = avg_buy_price
+    d_res['avg_sell_price'] = avg_sell_price
+    d_res['avg_profit'] = math.floor(avg_profit)
+    d_res['avg_profit_percent'] = avg_profit_percent
+    
+    return render(request, 'sell/summary.html', d_res)
