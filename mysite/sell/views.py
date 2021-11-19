@@ -68,7 +68,6 @@ def add(request):
     return render(request, 'sell/add.html', {'form': form})
 
 from django.db.models import Q
-import math
 def summary(request):
     query = request.GET.get('q')
     d_res = {}
@@ -94,19 +93,19 @@ def summary(request):
             total_buy_of_item_sold += obj.buy_price
             total_profit += obj.profit_loss
 
-    avg_buy_price = total_buy / n_buy
-    avg_sell_price = total_sell / n_sell
-    avg_profit = total_profit / n_sell
-    avg_profit_percent = math.floor(total_profit / total_buy_of_item_sold * 100)
+    avg_buy_price = int(total_buy / n_buy)
+    avg_sell_price = int(total_sell / n_sell)
+    avg_profit = int(total_profit / n_sell)
+    avg_profit_percent = int(total_profit / total_buy_of_item_sold * 100)
 
     d_res['n_buy'] = n_buy
-    d_res['total_buy'] = total_buy
+    d_res['total_buy'] = int(total_buy)
     d_res['n_sell'] = n_sell
-    d_res['total_sell'] = total_sell
-    d_res['total_profit'] = total_profit
+    d_res['total_sell'] = int(total_sell)
+    d_res['total_profit'] = int(total_profit)
     d_res['avg_buy_price'] = avg_buy_price
     d_res['avg_sell_price'] = avg_sell_price
-    d_res['avg_profit'] = math.floor(avg_profit)
+    d_res['avg_profit'] = avg_profit
     d_res['avg_profit_percent'] = avg_profit_percent
     
     return render(request, 'sell/summary.html', d_res)

@@ -1,6 +1,11 @@
 {% load static %}
 
-<link href="{% static 'sell/css/bootstrap.min.css' %}" >  
+<script
+  src="https://code.jquery.com/jquery-3.3.1.js"
+  integrity="sha256-2Kok7MbOyxpgUVvAk/HJ2jigOSYS2auK4Pfzbm7uH60="
+  crossorigin="anonymous">
+</script>
+<link rel="stylesheet" type="text/css" href="{% static 'sell/css/bootstrap.min.css' %}" >  
 <script src="{% static 'sell/js/bootstrap.min.js' %}"></script>  
 <link rel="stylesheet" type="text/css" href="{% static 'sell/style.css' %}">
 
@@ -14,6 +19,6 @@
 {% endif %}
 <ul>Number of items you bought: {{ n_buy }} -- Total buy: ${{ total_buy }} -- Average buy price: ${{ avg_buy_price }}</ul>
 <ul>Number of items you sold: {{ n_sell }} -- Total sell: ${{ total_sell }} -- Average sell price ${{ avg_sell_price }}</ul>
-<ul>Total profit/loss: {{ total_profit }} -- Average P/L: ${{ avg_profit }} -- Average P/L (%): {{ avg_profit_percent }}%</ul>
+<ul>Total profit/loss: ${{ total_profit }} -- Average P/L: ${{ avg_profit }} -- Average P/L (%): {{ avg_profit_percent }}%</ul>
 
 <a class="button" href="{% url 'sell:index' %}">Back to index</a>
