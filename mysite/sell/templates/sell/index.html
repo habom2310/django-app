@@ -1,0 +1,58 @@
+{% load static %}
+
+<script
+  src="https://code.jquery.com/jquery-3.3.1.js"
+  integrity="sha256-2Kok7MbOyxpgUVvAk/HJ2jigOSYS2auK4Pfzbm7uH60="
+  crossorigin="anonymous">
+</script>
+<link rel="stylesheet" type="text/css" href="{% static 'sell/css/bootstrap.min.css' %}" >  
+<script src="{% static 'sell/js/bootstrap.min.js' %}"></script>
+<link rel="stylesheet" type="text/css" href="{% static 'sell/style.css' %}">
+
+{% if latest_item_list %}
+<div class="table-responsive-sm">
+    <table class="table table-bordered table-hover">
+        <thead class="thead-dark">
+            <tr>
+                <th scope='col'>#</th>
+                <th scope='col'>Item Name</th>
+                <th scope='col'>Buy Price</th>
+                <th scope='col'>Buy Date</th>
+                <th scope='col'>Buy Source</th>
+                <th scope='col'>Sell Price</th>
+                <th scope='col'>Sell Date</th>
+                <th scope='col'>Profit</th>
+            </tr>
+        </thead>
+    {% for item in latest_item_list %}
+        <tbody>
+            <tr>
+                <th scope="row">{{ forloop.counter0 }}</th>
+                <td><a href="{% url 'sell:detail' item.id %}">{{ item.item_name }}</a></td>
+                <td>{{ item.buy_price }}</td>
+                <td>{{ item.buy_date }}</td>
+                <td>{{ item.buy_source }}</td>
+                <td>{{ item.sell_price }}</td>
+                <td>{{ item.sell_date }}</td>
+                <td>{{ item.profit_loss }}</td>
+            </tr>
+        </tbody>
+        
+    {% endfor %}
+    </table>
+</div>
+{% else %}
+    <p>No item are available.</p>
+{% endif %}
+
+<div class="container">
+    <div class="row">
+        <div class="col">
+            <a class="button" href="{% url 'sell:add' %}">New item</a>
+        </div>
+        <div class="col">
+            <a class="button" href="{% url 'sell:summary' %}">Summary</a>
+        </div>
+    </div>
+</div>
+
