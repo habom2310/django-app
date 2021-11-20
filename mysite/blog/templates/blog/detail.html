@@ -14,7 +14,9 @@
 <li><b> Title:</b> {{ blog.title }}</li>
 <li><b> Genre:</b> {{ blog.genre }}</li>
 <li><b> Content:</b> 
-    {% autoescape off %} 
+    {% autoescape off %}
     {{ blog.body }}
     {% endautoescape %}
 </li>
+
+<a class="button" href="{% url 'blog:edit' blog.id %}">Edit post</a>

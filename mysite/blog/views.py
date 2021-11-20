@@ -7,6 +7,7 @@ from django.urls import reverse
 from django.utils import timezone
 from .forms import BlogForm
 import os 
+import json
 
 class IndexView(generic.ListView):
     template_name = 'blog/index.html'
@@ -78,8 +79,45 @@ def add(request):
             blog_post.updated_at = timezone.now()
             blog_post.save()
             return HttpResponseRedirect(reverse('blog:index'))
-        else:
-            print("invalid")
     else:
         form = BlogForm()
     return render(request, 'blog/add.html', {'form': form})
+
+def ajax_preview(request):
+    if request.is_ajax() or request.method == 'POST':
+        print("ajax here")
+        body = request.POST.get('mdtext', "")
+        body = md_converter.md_convert(body)
+
+        return HttpResponse(json.dumps({'html_output': body}), content_type="application/json", status=200)
+    else:
+        return HttpResponse("")
+
+def edit(request, pk):
+    blog = get_object_or_404(Content, pk=pk)
+    return render(request, 'blog/edit.html', {'blog': blog})
+
+def edit_confirm(request, pk):
+    blog_post = get_object_or_404(Content, pk=pk)
+    if request.method == 'POST':
+        title = request.POST.get("title", "")
+        body = request.POST.get("markdown_text", "")
+        valid = True
+        if title != "":
+            blog_post.title = title
+        else:
+            valid = False
+        if body != "":
+            blog_post.body = body
+        else:
+            valid = False
+
+        if valid:
+            blog_post.updated_at = timezone.now()
+            blog_post.save()
+            return HttpResponseRedirect(reverse('blog:index'))
+        else:
+            print("invalid")
+            return render(request, 'blog/edit.html', {'blog': blog_post, 'error_message': 'Empty title or body'})
+    else:
+        return render(request, 'blog/edit.html', {'blog': blog_post})
