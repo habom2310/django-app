@@ -10,6 +10,7 @@ import os
 import json
 from . import utils
 
+
 class IndexView(generic.ListView):
     template_name = 'blog/index.html'
     context_object_name = 'latest_blog_list'
@@ -22,8 +23,9 @@ def detail(request, pk):
     blog = get_object_or_404(Content, pk=pk)
     md_text = utils.read_md_file(blog.body)
     html_text = md_converter.md_convert(md_text)
+    print(md_text)
     blog.body = html_text
-    # print(blog.body)
+    print(html_text)
     return render(request, 'blog/detail.html', {'blog': blog})
 
 def add(request):
@@ -62,19 +64,12 @@ def add(request):
         form = BlogForm()
     return render(request, 'blog/add.html', {'form': form})
 
-def string_escape(s, encoding='utf-8'):
-    return (s.encode('latin1')         # To bytes, required by 'unicode-escape'
-             .decode('unicode-escape') # Perform the actual octal-escaping decode
-             .encode('latin1')         # 1:1 mapping back to bytes
-             .decode(encoding))        # Decode original encoding
-
 def ajax_preview(request):
     if request.is_ajax() or request.method == 'POST':
         print("ajax here")
         body = request.POST.get('mdtext', "")
-        body = md_converter.md_convert(string_escape(body[1:-1]))
-        # print(body)
-
+        body = md_converter.md_convert(body[1:-1].replace(r'\n', '\n'))
+        
         return HttpResponse(json.dumps({'html_output': body}), content_type="application/json", status=200)
     else:
         return HttpResponse("")
