@@ -8,6 +8,7 @@ from django.utils import timezone
 from .forms import BlogForm
 import os 
 import json
+from . import utils
 
 class IndexView(generic.ListView):
     template_name = 'blog/index.html'
@@ -19,33 +20,11 @@ class IndexView(generic.ListView):
         
 def detail(request, pk):
     blog = get_object_or_404(Content, pk=pk)
-    # blog.body = md_converter.md_convert(blog.body)
+    md_text = utils.read_md_file(blog.body)
+    html_text = md_converter.md_convert(md_text)
+    blog.body = html_text
     # print(blog.body)
     return render(request, 'blog/detail.html', {'blog': blog})
-
-class DetailView(generic.DetailView):
-    model = Content
-    template_name = 'blog/detail.html'
-
-    def get_queryset(self):
-        return Content.objects.all()
-
-def handle_uploaded_file(f, file_name):
-    dt = timezone.datetime.now()
-    folder_name = "blog/static/blog/" + dt.strftime('%Y%m%d')
-    if os.path.exists(folder_name) == False:
-        os.mkdir(folder_name)
-
-    with open(f'{folder_name}/{file_name}.md', 'wb+') as destination:
-        body = f.read()
-        destination.write(body)
-        body = md_converter.md_convert(body.decode('utf-8'))
-        print(body)
-
-    print(f"[Info] File writen to '{folder_name}/{file_name}.md'")
-
-    return body
-
 
 def add(request):
     print("here")
@@ -69,10 +48,10 @@ def add(request):
                 has_text = True
 
             if has_file == True:
-                blog_post.body = handle_uploaded_file(file, blog_post.title)
+                blog_post.body = utils.handle_uploaded_file(file, blog_post.title)
             else:
                 if has_text == True:
-                    blog_post.body = md_converter.md_convert(blog_post.body)
+                    blog_post.body = utils.save_md_to_file(blog_post.body, blog_post.title)
                 else:
                     return render(request, 'blog/add.html', {'form': form, 'error_message': 'Enter something in the body or upload a md file'})
 
@@ -83,11 +62,18 @@ def add(request):
         form = BlogForm()
     return render(request, 'blog/add.html', {'form': form})
 
+def string_escape(s, encoding='utf-8'):
+    return (s.encode('latin1')         # To bytes, required by 'unicode-escape'
+             .decode('unicode-escape') # Perform the actual octal-escaping decode
+             .encode('latin1')         # 1:1 mapping back to bytes
+             .decode(encoding))        # Decode original encoding
+
 def ajax_preview(request):
     if request.is_ajax() or request.method == 'POST':
         print("ajax here")
         body = request.POST.get('mdtext', "")
-        body = md_converter.md_convert(body)
+        body = md_converter.md_convert(string_escape(body[1:-1]))
+        print(body)
 
         return HttpResponse(json.dumps({'html_output': body}), content_type="application/json", status=200)
     else:
@@ -95,29 +81,38 @@ def ajax_preview(request):
 
 def edit(request, pk):
     blog = get_object_or_404(Content, pk=pk)
+    md_text = utils.read_md_file(blog.body)
+    blog.body = md_text
+
     return render(request, 'blog/edit.html', {'blog': blog})
 
 def edit_confirm(request, pk):
-    blog_post = get_object_or_404(Content, pk=pk)
+    blog = get_object_or_404(Content, pk=pk)
     if request.method == 'POST':
         title = request.POST.get("title", "")
-        body = request.POST.get("markdown_text", "")
+        md_text = request.POST.get("markdown_text", "")
+
         valid = True
         if title != "":
-            blog_post.title = title
+            blog.title = title
         else:
             valid = False
-        if body != "":
-            blog_post.body = body
+        if md_text != "":
+            file_path = blog.body
+            utils.update_md_file(file_path, md_text)
         else:
             valid = False
 
         if valid:
-            blog_post.updated_at = timezone.now()
-            blog_post.save()
+            blog.updated_at = timezone.now()
+            blog.save()
             return HttpResponseRedirect(reverse('blog:index'))
         else:
             print("invalid")
-            return render(request, 'blog/edit.html', {'blog': blog_post, 'error_message': 'Empty title or body'})
+            blog.body = md_text
+            return render(request, 'blog/edit.html', {'blog': blog, 'error_message': 'Empty title or body'})
     else:
-        return render(request, 'blog/edit.html', {'blog': blog_post})
+        md_text = utils.read_md_file(blog.body)
+        html_text = md_converter.md_convert(md_text)
+        blog.body = html_text
+        return render(request, 'blog/edit.html', {'blog': blog})

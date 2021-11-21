@@ -10,16 +10,6 @@
 <link rel="stylesheet" type="text/css" href="{% static 'blog/style.css' %}">
 <script src="{% static 'blog/js/md.js' %}"></script>
 
-<link href="{% static 'blog/js/codemirror-5.15.2/codemirror.css' %}" rel="stylesheet">
-<link href="{% static 'blog/js/codemirror-5.15.2/theme/neat.css' %}" rel="stylesheet">
-<link href="{% static 'blog/js/codemirror-5.15.2/theme/3024-night.css' %}" rel="stylesheet">
-<link href="{% static 'blog/js/codemirror-5.15.2/addon/dialog/dialog.css' %}" rel="stylesheet">
-
-<script src="{% static 'blog/js/codemirror-5.15.2/codemirror.js' %}"></script>
-<script src="{% static 'blog/js/codemirror-5.15.2/mode/markdown.js' %}"></script>
-<script src="{% static 'blog/js/codemirror-5.15.2/keymap/vim.js' %}"></script>
-<script src="{% static 'blog/js/codemirror-5.15.2/addon/dialog/dialog.js' %}"></script>
-
 <h1>Blog editor</h1> 
 
 <form action="{% url 'blog:edit_confirm' blog.id %}" method="post" id="editform">

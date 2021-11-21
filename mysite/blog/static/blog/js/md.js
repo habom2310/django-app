@@ -44,10 +44,10 @@ function tryAjaxUpdatePreview() {
             // contentType: "text/plain",
             success: function( data ) {
                 console.log("success");
-                console.log(data);
+                console.log(data["html_output"]);
                 isSending = false;
                 setTimeout(tryAjaxUpdatePreview, 0);
-                $("#html_result").html(unescape(data["html_output"]));
+                $("#html_result").html(data["html_output"]);
             },
             error: function() {
                 alert('Error occured');
