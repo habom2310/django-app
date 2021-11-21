@@ -21,14 +21,17 @@
 </form> 
 
 <li><label for="body">Body:</label>
-    <div id="mdedit-body" style="padding:15px; position: relative; top:0; bottom:0; left:0; right:0" class="row">
-        <div style="height:100%" class="col-sm-6">
+<div class="container"  style="padding:3px;">
+    <div id="mdedit-body" style="padding:3px; position: relative; top:0; bottom:0; left:0; right:0" class="row">
+        <div style="height:100%; width:50%" class="col-sm-6">
             <textarea style="font-family: monospace; font-size: medium; color:#222; width:100%; height:100%" id="markdown_input" cols="80" rows="30" name="markdown_text" form="editform">{{blog.body}}</textarea>
         </div>
-        <div style="height:100%; padding-left:0px" class="col-sm-6">
-            <div class="html-output markdown-body" id="html_result" style=" height:100%"></div>
+        <div style="height:100%; width:50%; padding-left:0px" class="col-sm-6">
+            <div class="html-output markdown-body border rounded-top" id="html_result" style=" height:100%"></div>
         </div>
     </div>
+</div>
+    
 
 
     {% if error_message %}<p class="error_message">{{ error_message }}</p>{% endif %}

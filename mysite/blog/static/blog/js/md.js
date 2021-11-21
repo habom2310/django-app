@@ -43,11 +43,13 @@ function tryAjaxUpdatePreview() {
             dataType: "json",
             // contentType: "text/plain",
             success: function( data ) {
-                console.log("success");
-                console.log(data["html_output"]);
+                console.log("request /blog/ajax/preview/ success");
+                // console.log(data["html_output"]);
                 isSending = false;
                 setTimeout(tryAjaxUpdatePreview, 0);
                 $("#html_result").html(data["html_output"]);
+                var h = $("#markdown_input").height();
+                $("#html_result").height(h);
             },
             error: function() {
                 alert('Error occured');
@@ -61,49 +63,33 @@ function updateMarkdownInput(value) {
     myCodeMirror.setValue(value);
 }
 
-$(document).ready(function() {
+var ignoreScrollEvents = false;
+function syncScroll(element1, element2) {
+    var ele1 = document.getElementById(element1);
+    var ele2 = document.getElementById(element2);
+    let maxY1 = ele1.scrollHeight - ele1.clientHeight;
+    let maxY2 = ele2.scrollHeight - ele2.clientHeight;
 
+    var ratio = maxY2 / maxY1;
+
+    ele2.scrollTop = ele1.scrollTop * ratio;
+}
+
+$(document).ready(function() {
     // Setup custom header height
     head_height = $('#head').outerHeight(true);
     $('#mdedit').css('top', head_height+'px');
     $('#mdedit-body').css('top', (head_height+$('#mdedit').height())+'px');
     $('#markdown_input').bind('input propertychange', function(){
-        console.log(this.value);
+        // console.log(this.value);
         ajaxUpdatePreview();
     });
-    // Setup CodeMirror for markdown input
-    // CodeMirror.commands.save = function(instance) {ajaxSaveFile();}
+    console.log($('#markdown_input').scrollTop());
 
-    // myCodeMirror = CodeMirror.fromTextArea(document.getElementById('markdown_input'), {
-    //     value: "",
-    //     mode: {name:"markdown",fencedCodeBlocks:true, underscoresBreakWords:false},
-    //     indentUnit: "4",
-    //     showCursorWhenSelecting: true,
-    //     theme: "neat",
-    //     vimMode: false
-    //     });
-    // $(".CodeMirror").addClass("form-control");
-    // $(".CodeMirror").addClass("focusedInput");
-    // $(".CodeMirror").attr('form', 'editform');
-    // myCodeMirror.setSize("100%","100%");
-    // myCodeMirror.on("change", function(instance, changeObj) {ajaxUpdatePreview();});
+    $('#markdown_input').attr('onscroll', 'syncScroll("markdown_input", "html_result")');
+    // $('#html_result').attr('onscroll', 'syncScroll("html_result", "markdown_input")');
 
-    // Setup scrollbars sync
-    // var s1 = myCodeMirror.display.scrollbars.vert
-    // var s1 = $('#markdown_input').get(0).scrollTop;
-    // var s2 = $('#html_result')[0]
-
-    // function select_scroll(e) {
-    //     viewHeight = s2.getBoundingClientRect().height
-    //     ratio = (s2.scrollHeight-viewHeight)/(s1.scrollHeight-viewHeight)
-    //     s2.scrollTop = s1.scrollTop*ratio;
-    // }
-
-    // s1.addEventListener('scroll', select_scroll, false);
-
-    // Set Focus on markdown input
-    // $('#pleaseWaitDialog').on('hidden.bs.modal', function () {myCodeMirror.focus()})
-
+    
     ajaxUpdatePreview();
 
 });

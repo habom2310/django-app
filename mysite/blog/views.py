@@ -73,7 +73,7 @@ def ajax_preview(request):
         print("ajax here")
         body = request.POST.get('mdtext', "")
         body = md_converter.md_convert(string_escape(body[1:-1]))
-        print(body)
+        # print(body)
 
         return HttpResponse(json.dumps({'html_output': body}), content_type="application/json", status=200)
     else:
