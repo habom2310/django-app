@@ -1,7 +1,7 @@
 from django.shortcuts import render, get_object_or_404
 from django.views import generic
 from django.http import HttpResponse, HttpResponseRedirect
-from .models import Content
+from .models import Content, Author, Genre
 from . import md_converter
 from django.urls import reverse
 from django.utils import timezone
@@ -10,23 +10,26 @@ import os
 import json
 from . import utils
 
-
 class IndexView(generic.ListView):
-    template_name = 'blog/index.html'
+    template_name = 'blog/index2.html'
     context_object_name = 'latest_blog_list'
 
     def get_queryset(self):
         """Return all blog"""
-        return Content.objects.all()
-        
+        return Content.objects.filter(created_at__lte=timezone.now()).order_by('-created_at')[:5]
+
+def tag_view(request, tag):
+    blog_list = Content.objects.filter(tag__contains=tag).order_by('-created_at')
+
+    return render(request, 'blog/index2.html', {'latest_blog_list': blog_list})
+
 def detail(request, pk):
     blog = get_object_or_404(Content, pk=pk)
     md_text = utils.read_md_file(blog.body)
     html_text = md_converter.md_convert(md_text)
-    print(md_text)
     blog.body = html_text
-    print(html_text)
-    return render(request, 'blog/detail.html', {'blog': blog})
+    blog.tag = [tag for tag in blog.tag.split(',') if tag.replace(" ","") != '']
+    return render(request, 'blog/detail2.html', {'blog': blog})
 
 def add(request):
     print("here")
@@ -36,7 +39,7 @@ def add(request):
             has_file = False
             has_text = False
             print("valid")
-            blog_post = form.save(commit=False)
+            blog = form.save(commit=False)
             if request.FILES.get('file_upload', False):
                 file = request.FILES['file_upload']
                 if str(file)[-3:] != '.md':
@@ -46,19 +49,29 @@ def add(request):
             else:
                 print('No file upload')
 
-            if blog_post.body != '':
+            if blog.body != '':
                 has_text = True
 
             if has_file == True:
-                blog_post.body = utils.handle_uploaded_file(file, blog_post.title)
+                blog.body = utils.handle_uploaded_file(file, blog.title)
             else:
                 if has_text == True:
-                    blog_post.body = utils.save_md_to_file(blog_post.body, blog_post.title)
+                    blog.body = utils.save_md_to_file(blog.body, blog.title)
                 else:
                     return render(request, 'blog/add.html', {'form': form, 'error_message': 'Enter something in the body or upload a md file'})
 
-            blog_post.updated_at = timezone.now()
-            blog_post.save()
+            if request.FILES.get('thumbnail', False):
+                thumbnail = request.FILES['thumbnail']
+                print("thumbnail uploaded")                
+                file_path = utils.save_image(thumbnail, blog.title)
+                file_path_to_save = "/".join(file_path.split("/")[2:])
+                blog.thumbnail = str(file_path_to_save)
+            else:
+                print("no thumbnail uploaded. choose a random one.")
+                blog.thumbnail = utils.get_random_thumbnail(blog.title)
+
+            blog.updated_at = timezone.now()
+            blog.save()
             return HttpResponseRedirect(reverse('blog:index'))
     else:
         form = BlogForm()

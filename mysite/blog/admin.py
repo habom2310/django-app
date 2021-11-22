@@ -7,7 +7,7 @@ class GenreAdmin(admin.ModelAdmin):
 
 class ContentAdmin(admin.ModelAdmin):
     model = Content
-    list_display = ('title', 'genre', 'github_link', 'body_display')
+    # list_display = ('title', 'genre', 'github_link', 'body_display')
 
 class AuthorAdmin(admin.ModelAdmin):
     model = Author

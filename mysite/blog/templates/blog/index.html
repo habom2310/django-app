@@ -7,14 +7,17 @@
 </script>
 <link rel="stylesheet" type="text/css" href="{% static 'blog/css/bootstrap.min.css' %}" >  
 <script src="{% static 'blog/js/bootstrap.min.js' %}"></script>
-<link rel="stylesheet" type="text/css" href="{% static 'blog/style.css' %}">
+<link rel="stylesheet" type="text/css" href="{% static 'blog/css/style.css' %}">
 
 {% if latest_blog_list %}
-    {% for blog in latest_blog_list %}
+  {% for blog in latest_blog_list %}
     <ul>
-      <li><a href="{% url 'blog:detail' blog.id %}">{{ blog.id }}: {{ blog.title }}</a></li>
+      <li>
+        <img src="{% static blog.thumbnail %}" alt="{{ blog.title }}" width="200" height="300"></img>
+        <a href="{% url 'blog:detail' blog.id %}">{{ blog.id }}: {{ blog.title }}</a>
+      </li>
     </ul>
-    {% endfor %}
+  {% endfor %}
 {% endif %}
 
 <!-- A button for adding a new blog post -->
