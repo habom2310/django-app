@@ -36,7 +36,7 @@ def add(request):
             has_file = False
             has_text = False
             print("valid")
-            blog_post = form.save(commit=False)
+            blog = form.save(commit=False)
             if request.FILES.get('file_upload', False):
                 file = request.FILES['file_upload']
                 if str(file)[-3:] != '.md':
@@ -46,19 +46,29 @@ def add(request):
             else:
                 print('No file upload')
 
-            if blog_post.body != '':
+            if blog.body != '':
                 has_text = True
 
             if has_file == True:
-                blog_post.body = utils.handle_uploaded_file(file, blog_post.title)
+                blog.body = utils.handle_uploaded_file(file, blog.title)
             else:
                 if has_text == True:
-                    blog_post.body = utils.save_md_to_file(blog_post.body, blog_post.title)
+                    blog.body = utils.save_md_to_file(blog.body, blog.title)
                 else:
                     return render(request, 'blog/add.html', {'form': form, 'error_message': 'Enter something in the body or upload a md file'})
 
-            blog_post.updated_at = timezone.now()
-            blog_post.save()
+            if request.FILES.get('thumbnail', False):
+                thumbnail = request.FILES['thumbnail']
+                print("thumbnail uploaded")                
+                file_path = utils.save_image(thumbnail, blog.title)
+                file_path_to_save = "/".join(file_path.split("/")[2:])
+                blog.thumbnail = str(file_path_to_save)
+            else:
+                print("no thumbnail uploaded. choose a random one.")
+                blog.thumbnail = utils.get_random_thumbnail(blog.title)
+
+            blog.updated_at = timezone.now()
+            blog.save()
             return HttpResponseRedirect(reverse('blog:index'))
     else:
         form = BlogForm()

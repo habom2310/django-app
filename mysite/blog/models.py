@@ -44,6 +44,7 @@ class Content(models.Model):
     author = models.ForeignKey(Author, on_delete=models.CASCADE, blank=True, null=True)
     github_link = models.CharField(max_length=200, blank=True, default="")
     body = models.CharField(max_length=200, blank=True, default="")
+    thumbnail = models.CharField(max_length=200, blank=True, default="")
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
