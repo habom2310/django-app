@@ -47,6 +47,7 @@ class Content(models.Model):
     thumbnail = models.CharField(max_length=200, blank=True, default="")
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
+    tag = models.CharField(max_length=200, blank=True, default="")
 
     @property
     def body_display(self):

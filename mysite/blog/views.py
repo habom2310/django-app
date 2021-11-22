@@ -1,7 +1,7 @@
 from django.shortcuts import render, get_object_or_404
 from django.views import generic
 from django.http import HttpResponse, HttpResponseRedirect
-from .models import Content
+from .models import Content, Author, Genre
 from . import md_converter
 from django.urls import reverse
 from django.utils import timezone
@@ -10,23 +10,26 @@ import os
 import json
 from . import utils
 
-
 class IndexView(generic.ListView):
-    template_name = 'blog/index.html'
+    template_name = 'blog/index2.html'
     context_object_name = 'latest_blog_list'
 
     def get_queryset(self):
         """Return all blog"""
-        return Content.objects.all()
-        
+        return Content.objects.filter(created_at__lte=timezone.now()).order_by('-created_at')[:5]
+
+def tag_view(request, tag):
+    blog_list = Content.objects.filter(tag__contains=tag).order_by('-created_at')
+
+    return render(request, 'blog/index2.html', {'latest_blog_list': blog_list})
+
 def detail(request, pk):
     blog = get_object_or_404(Content, pk=pk)
     md_text = utils.read_md_file(blog.body)
     html_text = md_converter.md_convert(md_text)
-    print(md_text)
     blog.body = html_text
-    print(html_text)
-    return render(request, 'blog/detail.html', {'blog': blog})
+    blog.tag = [tag for tag in blog.tag.split(',') if tag.replace(" ","") != '']
+    return render(request, 'blog/detail2.html', {'blog': blog})
 
 def add(request):
     print("here")
