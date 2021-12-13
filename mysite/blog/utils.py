@@ -4,13 +4,17 @@ import io
 from PIL import Image 
 import requests
 
-def get_folder_name(title):
+def get_folder_name(title, type = "post"):
     '''
     the folder name will be create at the time the function is called
     it will be created in the blog/static/blog/content/posts<date created>
     '''
     dt = timezone.datetime.now()
-    folder_name = "blog/static/blog/content/posts/" + dt.strftime('%Y%m%d')
+    if type == "post":
+        folder_name = "blog/static/blog/content/posts/" + dt.strftime('%Y%m%d')
+    elif type == "author":
+        folder_name = "blog/static/blog/content/author/" 
+
     if os.path.exists(folder_name) == False:
         os.mkdir(folder_name)
 
@@ -80,12 +84,12 @@ def update_md_file(file_path, md_text):
 #              .decode('unicode-escape') # Perform the actual octal-escaping decode
 #              .encode('iso-8859-1')         # 1:1 mapping back to bytes
 #              .decode(encoding))        # Decode original encoding
-def save_image(image, file_name):
+def save_image(image, file_name, type="post"):
     '''
     this will save the image to the folder
     '''
     extension = str(image).split('.')[-1]
-    folder_name = get_folder_name(file_name)
+    folder_name = get_folder_name(file_name, type)
     file_path = f'{folder_name}/img/{file_name}.{extension}'
     with Image.open(image) as im:
         print(im.info)
@@ -93,11 +97,11 @@ def save_image(image, file_name):
 
     return file_path
 
-def get_random_thumbnail(file_name):
+def get_random_thumbnail(file_name, type="post"):
     '''
     this will return a random thumbnail
     '''
-    folder_name = get_folder_name(file_name)
+    folder_name = get_folder_name(file_name, type)
     file_path = f'{folder_name}/img/{file_name}.jpg'
 
     download_image('https://picsum.photos/200/300/?random.jpg', file_path)

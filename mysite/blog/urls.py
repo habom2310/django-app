@@ -11,4 +11,5 @@ urlpatterns = [
     path('<int:pk>/edit/', views.edit, name='edit'),
     path('<int:pk>/edit/edit_confirm/', views.edit_confirm, name='edit_confirm'),
     path('tag/<str:tag>', views.tag_view, name='tag'),
+    # path('')
 ]

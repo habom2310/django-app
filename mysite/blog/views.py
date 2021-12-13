@@ -16,7 +16,12 @@ class IndexView(generic.ListView):
 
     def get_queryset(self):
         """Return all blog"""
-        return Content.objects.filter(created_at__lte=timezone.now()).order_by('-created_at')[:5]
+        latest_blog_list = Content.objects.filter(created_at__lte=timezone.now()).order_by('-created_at')[:5]
+        for blog in latest_blog_list:
+            md_text = utils.read_md_file(blog.body)
+            blog.body = md_converter.md_convert(md_text)
+
+        return latest_blog_list
 
 def tag_view(request, tag):
     blog_list = Content.objects.filter(tag__contains=tag).order_by('-created_at')
